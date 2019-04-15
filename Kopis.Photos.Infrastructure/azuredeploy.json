@@ -228,7 +228,7 @@
               "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('jobsStorageName'), ';AccountKey=', listKeys(variables('jobsStorageName'),'2015-05-01-preview').key1)]"
             },
             {
-              "name": "StorageConnectionString",
+              "name": "UploadStorage",
               "value": "[Concat('DefaultEndpointsProtocol=https;AccountName=',variables('uploadStorageName'),';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('uploadStorageName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value)]"
             },
             {
@@ -267,6 +267,7 @@
           "properties": {
             "packageUri": "[concat(parameters('_artifactsLocation'), '/', 'Kopis.Photos.Functions', '/', 'package.zip', parameters('_artifactsLocationSasToken'))]",
             "dbType": "None",
+            "AppOffline": true,
             "connectionString": "",
             "setParameters": {
             }
