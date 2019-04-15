@@ -80,6 +80,55 @@
         "westus"
       ],
       "defaultValue": "eastus2"
+    },
+    "SearchSku": {
+      "type": "string",
+      "defaultValue": "free",
+      "allowedValues": [
+        "free",
+        "basic",
+        "standard",
+        "standard2",
+        "standard3"
+      ],
+      "metadata": {
+        "description": "The SKU of the search service you want to create. E.g. free or standard"
+      }
+    },
+    "SearchReplicaCount": {
+      "type": "int",
+      "minValue": 1,
+      "maxValue": 12,
+      "defaultValue": 1,
+      "metadata": {
+        "description": "Replicas distribute search workloads across the service. You need 2 or more to support high availability (applies to Basic and Standard only)."
+      }
+    },
+    "SearchPartitionCount": {
+      "type": "int",
+      "allowedValues": [
+        1,
+        2,
+        3,
+        4,
+        6,
+        12
+      ],
+      "defaultValue": 1,
+      "metadata": {
+        "description": "Partitions allow for scaling of document count as well as faster indexing by sharding your index over multiple Azure Search units."
+      }
+    },
+    "SearchHostingMode": {
+      "type": "string",
+      "defaultValue": "default",
+      "allowedValues": [
+        "default",
+        "highDensity"
+      ],
+      "metadata": {
+        "description": "Applicable only for SKU set to standard3. You can set this property to enable a single, high density partition that allows up to 1000 indexes, which is much higher than the maximum indexes allowed for any other SKU."
+      }
     }
   },
 
@@ -91,7 +140,9 @@
     "jobsStorageName": "[concat('photosjobs', toLower(parameters('Environment')))]",
     "functionsName": "[concat('photos-', toLower(parameters('Environment')), '-functions')]",
     "cognitiveServicesName": "[concat('photos-', toLower(parameters('Environment')), '-cognitive')]",
-    "cognitiveServicesId": "[concat(resourceGroup().id,'/providers/','Microsoft.CognitiveServices/accounts/', variables('cognitiveServicesName'))]"
+    "cognitiveServicesId": "[concat(resourceGroup().id,'/providers/','Microsoft.CognitiveServices/accounts/', variables('cognitiveServicesName'))]",
+    "searchServiceName": "[concat('photos-', toLower(parameters('Environment')), '-search')]",
+    "searchServiceId": "[resourceId('Microsoft.Search/searchServices', toLower(variables('searchServiceName')))]"
   },
   "resources": [
     {
@@ -163,7 +214,9 @@
           ],
           "properties": {
             "Values:StorageConnectionString": "[Concat('DefaultEndpointsProtocol=https;AccountName=',variables('uploadStorageName'),';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('uploadStorageName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value)]",
-            "ApplicationInsights:InstrumentationKey": "[reference(resourceId('Microsoft.Insights/components', variables('webSiteName')), '2014-04-01').InstrumentationKey]"
+            "ApplicationInsights:InstrumentationKey": "[reference(resourceId('Microsoft.Insights/components', variables('webSiteName')), '2014-04-01').InstrumentationKey]",
+            "Values:SearchServiceApiKey": "[listAdminKeys(variables('searchServiceId'), '2015-08-19').PrimaryKey]",
+            "Values:SearchServiceName": "[toLower(variables('searchServiceName'))]"
           }
         }
       ]
@@ -278,6 +331,14 @@
             {
               "name": "CognitiveApiUrl",
               "value": "[reference(variables('cognitiveServicesId'),'2016-02-01-preview').endpoint]"
+            },
+            {
+              "name": "SearchServiceApiKey",
+              "value": "[listAdminKeys(variables('searchServiceId'), '2015-08-19').PrimaryKey]"
+            },
+            {
+              "name": "SearchServiceName",
+              "value": "[variables('searchServiceName')]"
             }
           ]
         }
@@ -340,6 +401,23 @@
       },
       "properties": {},
       "dependsOn": []
+    },
+    {
+      "apiVersion": "2015-08-19",
+      "name": "[variables('searchServiceName')]",
+      "type": "Microsoft.Search/searchServices",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "displayName": "Search Service"
+      },
+      "sku": {
+        "name": "[toLower(parameters('SearchSku'))]"
+      },
+      "properties": {
+        "replicaCount": "[parameters('SearchReplicaCount')]",
+        "partitionCount": "[parameters('SearchPartitionCount')]",
+        "hostingMode": "[parameters('SearchHostingMode')]"
+      }
     }
   ],
   "outputs": {}

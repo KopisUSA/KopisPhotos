@@ -1,5 +1,7 @@
 ﻿using Microsoft.Azure.CognitiveServices.Vision.ComputerVision;
 using Microsoft.Azure.CognitiveServices.Vision.ComputerVision.Models;
+using Microsoft.Azure.Search;
+using Microsoft.Azure.Search.Models;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using Microsoft.WindowsAzure.Storage;
@@ -37,6 +39,17 @@ namespace Kopis.Photos.Functions
 
 				// Generate the thumbnail
 				var thumbnailUrl = await context.CallActivityAsync<string>("GenerateThumbnail", imageName);
+
+				//Index the metadata
+				var imageInfo = new ImageInfo
+				{
+					Url = finalUrl,
+					ThumbnailUrl = thumbnailUrl
+				};
+
+				imageInfo.SetAnalysisFields(imageAnalysis);
+
+				var indexed = await context.CallActivityAsync<bool>("IndexImageMetadata", imageInfo);
 			}
 			else
 			{
@@ -92,6 +105,40 @@ namespace Kopis.Photos.Functions
 			var result = await photoBlob.DeleteIfExistsAsync();
 			log.LogInformation(result ? $"Deleted {name}." : $"{name} does not exist.");
 			return result;
+		}
+
+		[FunctionName("IndexImageMetadata")]
+		public static bool IndexImageMetadata([ActivityTrigger] ImageInfo imageInfo, ILogger log)
+		{
+			string searchServiceName = Environment.GetEnvironmentVariable("SearchServiceName");
+			string adminApiKey = Environment.GetEnvironmentVariable("SearchServiceApiKey");
+
+			log.LogInformation($"Indexing {imageInfo.Url}.");
+
+			SearchServiceClient serviceClient = new SearchServiceClient(searchServiceName, new SearchCredentials(adminApiKey));
+
+			var index = serviceClient.Indexes.CreateOrUpdate(new Index
+			{
+				Name = "photos",
+				Fields = FieldBuilder.BuildForType<ImageInfo>()
+			});
+
+			SearchIndexClient indexClient = new SearchIndexClient(searchServiceName, "photos", new SearchCredentials(adminApiKey));
+			imageInfo.Id = Guid.NewGuid().ToString();
+			imageInfo.Uploaded = DateTimeOffset.Now;
+			var batch = IndexBatch.Upload(new[] { imageInfo });
+
+			try
+			{
+				indexClient.Documents.Index(batch);
+			}
+			catch (IndexBatchException ibEx)
+			{
+				log.LogError(ibEx, $"Error indexing {imageInfo.Url}");
+				throw;
+			}
+
+			return true;
 		}
 
 		private static async Task<string> GetBlobAccessUrl(string containerName, string name, TimeSpan timeout)
