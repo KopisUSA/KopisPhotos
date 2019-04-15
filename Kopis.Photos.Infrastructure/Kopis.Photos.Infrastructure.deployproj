@@ -31,6 +31,11 @@
     <Content Include="Deploy-AzureResourceGroup.ps1" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Kopis.Photos.Functions\Kopis.Photos.Functions.csproj">
+      <Targets>Build;Package</Targets>
+      <AdditionalProperties>PackageLocation=..\Kopis.Photos.Infrastructure\$(ProjectReferencesOutputPath)\Kopis.Photos.Functions\package.zip</AdditionalProperties>
+      <IncludeFilePath>$(ProjectReferencesOutputPath)\Kopis.Photos.Functions\package.zip</IncludeFilePath>
+    </ProjectReference>
     <ProjectReference Include="..\Kopis.Photos.Web\Kopis.Photos.Web.csproj">
       <Targets>
       </Targets>
