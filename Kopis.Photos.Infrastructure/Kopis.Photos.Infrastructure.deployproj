@@ -30,5 +30,13 @@
     </None>
     <Content Include="Deploy-AzureResourceGroup.ps1" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Kopis.Photos.Web\Kopis.Photos.Web.csproj">
+      <Targets>
+      </Targets>
+      <AdditionalProperties>WebPublishMethod=Package;DeployOnBuild=true;Configuration=Release;PublishProfile=Default;DesktopBuildPackageLocation=..\Kopis.Photos.Infrastructure\$(ProjectReferencesOutputPath)\Kopis.Photos.Web\package.zip</AdditionalProperties>
+      <IncludeFilePath>$(ProjectReferencesOutputPath)\Kopis.Photos.Web\package.zip</IncludeFilePath>
+    </ProjectReference>
+  </ItemGroup>
   <Target Name="GetReferenceAssemblyPaths" />
 </Project>

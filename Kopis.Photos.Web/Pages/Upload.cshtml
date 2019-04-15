@@ -1,0 +1,26 @@
+﻿@page
+@model Kopis.Photos.Web.Pages.UploadModel
+@{
+    ViewData["Title"] = "Upload";
+}
+
+<h2>Upload</h2>
+
+<form action="/upload"
+      class="dropzone"
+      id="photo-uploads">
+    @Html.AntiForgeryToken()
+</form>
+
+@section Scripts {
+    <script language="javascript">
+        Dropzone.options.photoUploads = {
+            init: function () {
+                this.on("complete", function (file) {
+                    var self = this;
+                    setTimeout(function () { self.removeFile(file); }, 2000);
+                });
+            }
+        }
+    </script>
+}
