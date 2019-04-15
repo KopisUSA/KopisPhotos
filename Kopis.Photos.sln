@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.572
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{151D2E53-A2C4-4D7D-83FE-D05416EBD58E}") = "Kopis.Photos.Infrastructure", "Kopis.Photos.Infrastructure\Kopis.Photos.Infrastructure.deployproj", "{95C05B09-C4F8-4079-83C4-5E2221BC126B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kopis.Photos.Web", "Kopis.Photos.Web\Kopis.Photos.Web.csproj", "{0631A21F-D7E1-4D8A-A61D-8468D347E893}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{95C05B09-C4F8-4079-83C4-5E2221BC126B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{95C05B09-C4F8-4079-83C4-5E2221BC126B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{95C05B09-C4F8-4079-83C4-5E2221BC126B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{95C05B09-C4F8-4079-83C4-5E2221BC126B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0631A21F-D7E1-4D8A-A61D-8468D347E893}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0631A21F-D7E1-4D8A-A61D-8468D347E893}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0631A21F-D7E1-4D8A-A61D-8468D347E893}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0631A21F-D7E1-4D8A-A61D-8468D347E893}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {FC0B484A-4230-4FC5-A334-8FEB80B11ED6}
+	EndGlobalSection
+EndGlobal
