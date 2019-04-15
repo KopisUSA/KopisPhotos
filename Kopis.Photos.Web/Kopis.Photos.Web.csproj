@@ -2,8 +2,6 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
-    <ApplicationInsightsResourceId>/subscriptions/fc450796-3db9-4c42-a952-90b06ec42e02/resourcegroups/Default-ApplicationInsights-EastUS/providers/microsoft.insights/components/Kopis.Photos.Web</ApplicationInsightsResourceId>
-    <ApplicationInsightsAnnotationResourceId>/subscriptions/fc450796-3db9-4c42-a952-90b06ec42e02/resourcegroups/Default-ApplicationInsights-EastUS/providers/microsoft.insights/components/Kopis.Photos.Web</ApplicationInsightsAnnotationResourceId>
   </PropertyGroup>
 
   <ItemGroup>
