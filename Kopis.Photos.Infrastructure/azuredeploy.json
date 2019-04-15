@@ -54,6 +54,32 @@
     },
     "_artifactsLocationSasToken": {
       "type": "securestring"
+    },
+    "CognitiveServicesSku": {
+      "type": "string",
+      "metadata": {
+        "description": "SKU for Computer Vision API"
+      },
+      "defaultValue": "F0",
+      "allowedValues": [
+        "F0",
+        "S1"
+      ]
+    },
+    "CognitiveServicesLocation": {
+      "metadata": {
+        "description": "The location for the Computer Vision API"
+      },
+      "type": "string",
+      "minLength": 1,
+      "allowedValues": [
+        "westeurope",
+        "eastus2",
+        "southeastasia",
+        "centralus",
+        "westus"
+      ],
+      "defaultValue": "eastus2"
     }
   },
 
@@ -63,7 +89,9 @@
     "uploadStorageName": "[concat('photos', toLower(parameters('Environment')))]",
     "functionsHostingPlanName": "[concat('photos-', toLower(parameters('Environment')), '-functionshosting')]",
     "jobsStorageName": "[concat('photosjobs', toLower(parameters('Environment')))]",
-    "functionsName": "[concat('photos-', toLower(parameters('Environment')), '-functions')]"
+    "functionsName": "[concat('photos-', toLower(parameters('Environment')), '-functions')]",
+    "cognitiveServicesName": "[concat('photos-', toLower(parameters('Environment')), '-cognitive')]",
+    "cognitiveServicesId": "[concat(resourceGroup().id,'/providers/','Microsoft.CognitiveServices/accounts/', variables('cognitiveServicesName'))]"
   },
   "resources": [
     {
@@ -242,6 +270,14 @@
             {
               "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
               "value": "[reference(resourceId('microsoft.insights/components/', variables('functionsName')), '2015-05-01').InstrumentationKey]"
+            },
+            {
+              "name": "CognitiveApiKey",
+              "value": "[listKeys(variables('cognitiveServicesId'),'2016-02-01-preview').key1]"
+            },
+            {
+              "name": "CognitiveApiUrl",
+              "value": "[reference(variables('cognitiveServicesId'),'2016-02-01-preview').endpoint]"
             }
           ]
         }
@@ -289,6 +325,21 @@
         "Application_Type": "web",
         "ApplicationId": "[variables('functionsName')]"
       }
+    },
+    {
+      "type": "Microsoft.CognitiveServices/accounts",
+      "sku": {
+        "name": "[parameters('CognitiveServicesSku')]"
+      },
+      "kind": "ComputerVision",
+      "name": "[variables('cognitiveServicesName')]",
+      "apiVersion": "2016-02-01-preview",
+      "location": "[parameters('cognitiveServicesLocation')]",
+      "tags": {
+        "displayName": "Cognitive Services Account"
+      },
+      "properties": {},
+      "dependsOn": []
     }
   ],
   "outputs": {}

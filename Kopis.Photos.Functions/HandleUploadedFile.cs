@@ -1,16 +1,27 @@
-using System.IO;
 using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Extensions.Logging;
+using Microsoft.WindowsAzure.Storage.Blob;
+using System.Threading.Tasks;
 
 namespace Kopis.Photos.Functions
 {
-    public static class HandleUploadedFile
+	public static class HandleUploadedFile
     {
         [FunctionName("HandleUploadedFile")]
-        public static void Run([BlobTrigger("uploaded/{name}", Connection = "UploadStorage")]Stream myBlob, string name, ILogger log)
+        public static async Task Run([BlobTrigger("uploaded/{name}", Connection = "UploadStorage")]CloudBlockBlob myBlob, string name, [OrchestrationClient] DurableOrchestrationClient starter, ILogger log)
         {
-            log.LogInformation($"C# Blob trigger function Processed blob\n Name:{name} \n Size: {myBlob.Length} Bytes");
-        }
+			if (name.ToLower().EndsWith("jpg"))
+			{
+				await starter.StartNewAsync("ImageApproval", name);
+				log.LogInformation($"Started processing {name} \n");
+			}
+			else
+			{
+				log.LogInformation($"{name} is not a photo \n");
+				await myBlob.DeleteIfExistsAsync();
+			}
+
+			log.LogInformation($"C# Blob trigger function Processed blob\n Name:{name} \n");
+		}
     }
 }
